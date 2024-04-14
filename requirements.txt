@@ -1,0 +1,6 @@
+Flask
+SQLAlchemy
+psycopg2
+psycopg2-binary
+Flask-SQLAlchemy
+Faker
