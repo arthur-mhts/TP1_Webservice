@@ -96,8 +96,6 @@ def populate_table():
 
 ##### Partie 2 
 
-## Ici mon code ne marche pas, je n'arrive pas à créer de nouvelle table 
-
 app2 = Flask(__name__)
 
 
@@ -132,22 +130,57 @@ class Application2(db.Model):
         self.appname = appname
         self.username = username
         self.user_id = user_id
+
+### Ajout des valeurs dans les tables
+
+fake= Faker()
+def populate_table2():
+    apps = ['Facebook', 'Twitter', 'Instagram', 'LinkedIn', 'Snapchat']
+    
+    # Ajout de données à la table Users2
+    for i in range(100):
+        firstname = fake.first_name()
+        lastname = fake.last_name()
+        age = random.randint(18, 90)
+        email = fake.email()
+        job = fake.job().replace("'", "")
+        
+        # Création d'une instance Users2 avec les valeurs générées
+        new_user = Users2(firstname=firstname, lastname=lastname, age=age, email=email, job=job)
+        
+        # Ajout de l'instance à la session SQLAlchemy
+        db.session.add(new_user)
+    
+    # Ajout de données à la table Application2
+    all_users = Users2.query.all()  # Récupération de tous les utilisateurs créés
+    for user in all_users:
+        num_apps = random.randint(1, 5)  # Nombre d'applications pour chaque utilisateur
+        for _ in range(num_apps):
+            appname = random.choice(apps)
+            username = fake.user_name()
+            lastconnection = datetime.now()
+            
+            # Création d'une instance Application2 avec les valeurs générées et l'utilisateur associé
+            new_app = Application2(appname=appname, username=username, lastconnection=lastconnection, user=user)
+            
+            # Ajout de l'instance à la session SQLAlchemy
+            db.session.add(new_app)
+    
+    # Commit des changements à la base de données
+    db.session.commit()
         
 
 
 
 if __name__ =='__main__':
-    # #Create user table 
-    # run_sql(create_user_table_sql)
-    # #Create Application table
-    # run_sql(create_application_table_sql)
+    #Create user table 
+    run_sql(create_user_table_sql)
+    #Create Application table
+    run_sql(create_application_table_sql)
     # populate_table()
     app.run(host="0.0.0.0", port=8081)
     with app2.app_context():
-        db.reflect()  # Récupère les informations sur les tables existantes
-        if not db.engine.dialect.has_table(db.engine, 'users2'):  # Vérifie si la table Users2 n'existe pas
-            db.create_all()  # Crée la table Users2 si elle n'existe pas déjà
-        if not db.engine.dialect.has_table(db.engine, 'application2'):  # Vérifie si la table Application2 n'existe pas
-            db.create_all()  # Crée la table Application2 si elle n'existe pas déjà
+        db.drop_all()
+        db.create_all()  
     app2.run(host="0.0.0.0", port=8082)
 
