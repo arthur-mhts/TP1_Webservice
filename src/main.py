@@ -105,9 +105,6 @@ app2.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://root:root@localhost:5432/
 app2.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app2)
 
-@app2.before_request
-def create_tables():
-    db.create_all()
 
 class Users2(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -116,6 +113,7 @@ class Users2(db.Model):
     age = db.Column(db.Integer())
     email = db.Column(db.String(100))
     job = db.Column(db.String(100))
+
     def __init__(self, firstname,lastname, age, email, job):
         self.firstname = firstname
         self.lastname = lastname
@@ -128,7 +126,8 @@ class Application2(db.Model):
     appname = db.Column(db.String(100))
     username = db.Column(db.String(100))
     lastconnection = db.Column(db.DateTime, default=datetime.now)
-    user_id = db.Column(db.Integer, db.ForeignKey('Users2.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users2.id'))
+
     def __init__(self, appname,username, user_id):
         self.appname = appname
         self.username = username
@@ -143,6 +142,12 @@ if __name__ =='__main__':
     # #Create Application table
     # run_sql(create_application_table_sql)
     # populate_table()
-    # app.run(host="0.0.0.0", port=8081)
+    app.run(host="0.0.0.0", port=8081)
+    with app2.app_context():
+        db.reflect()  # Récupère les informations sur les tables existantes
+        if not db.engine.dialect.has_table(db.engine, 'users2'):  # Vérifie si la table Users2 n'existe pas
+            db.create_all()  # Crée la table Users2 si elle n'existe pas déjà
+        if not db.engine.dialect.has_table(db.engine, 'application2'):  # Vérifie si la table Application2 n'existe pas
+            db.create_all()  # Crée la table Application2 si elle n'existe pas déjà
     app2.run(host="0.0.0.0", port=8082)
 
