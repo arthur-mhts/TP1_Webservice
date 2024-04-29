@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import TextClause, create_engine, text
 import random
 from faker import Faker
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 db_string = "postgresql://root:root@localhost:5432/postgres"
 
@@ -119,6 +119,11 @@ def get_users2():
         }
         data.append(user)
     return jsonify(data)
+
+@app2.route("/home", methods=["GET"])
+def home():
+    users = Users2.query.all()
+    return render_template("home.html", users=users)
 
 
 class Users2(db.Model):
