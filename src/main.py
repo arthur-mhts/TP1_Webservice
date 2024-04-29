@@ -120,6 +120,7 @@ def get_users2():
         data.append(user)
     return jsonify(data)
 
+### Ajout de l'API Web 
 @app2.route("/home", methods=["GET"])
 def home():
     users = Users2.query.all()
