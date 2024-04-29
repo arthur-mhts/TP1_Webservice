@@ -103,6 +103,23 @@ app2.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://root:root@localhost:5432/
 app2.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app2)
 
+# Récupération des données 
+@app2.route("/user2", methods=["GET"])
+def get_users2():
+    users2 = run_sql_with_results(text("SELECT * FROM users2"))
+    data=[]
+    for row in users2:
+        user = {
+            "id": row[0],
+            "firstname": row[1],
+            "lastname": row[2],
+            "age": row[3],
+            "email": row[4],
+            "job": row[5]
+        }
+        data.append(user)
+    return jsonify(data)
+
 
 class Users2(db.Model):
     id = db.Column(db.Integer, primary_key = True)
